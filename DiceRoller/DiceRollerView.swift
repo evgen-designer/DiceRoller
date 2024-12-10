@@ -71,7 +71,6 @@ struct DiceRollerView: View {
                 .padding(.vertical, 5)
                 
                 Divider()
-                    .padding(.bottom)
             }
         }
     }

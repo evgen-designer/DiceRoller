@@ -12,15 +12,19 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            DiceRollerView(historyManager: historyManager)
-                .tabItem {
-                    Label("Dice", systemImage: "dice")
-                }
+            NavigationStack {
+                DiceRollerView(historyManager: historyManager)
+            }
+            .tabItem {
+                Label("Dice", systemImage: "dice")
+            }
             
-            RollHistoryView(historyManager: historyManager)
-                .tabItem {
-                    Label("History", systemImage: "clock.arrow.circlepath")
-                }
+            NavigationStack {
+                RollHistoryView(historyManager: historyManager)
+            }
+            .tabItem {
+                Label("History", systemImage: "clock.arrow.circlepath")
+            }
         }
     }
 }
