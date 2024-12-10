@@ -30,7 +30,8 @@ struct RollHistoryView: View {
                 }
             }
         }
-        .navigationTitle("Roll history")
+        .navigationTitle("DiceRoller")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Clear history") {
@@ -38,5 +39,17 @@ struct RollHistoryView: View {
                 }
             }
         }
+    }
+}
+
+#Preview {
+    let historyManager = RollHistoryManager()
+    // Add some sample data for the preview
+    historyManager.saveRoll(RollResult(diceType: 6, numberOfDice: 2, total: 7))
+    historyManager.saveRoll(RollResult(diceType: 20, numberOfDice: 1, total: 18))
+    historyManager.saveRoll(RollResult(diceType: 12, numberOfDice: 3, total: 25))
+    
+    return NavigationView {
+        RollHistoryView(historyManager: historyManager)
     }
 }
