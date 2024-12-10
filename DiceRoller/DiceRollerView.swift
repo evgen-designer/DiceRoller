@@ -10,9 +10,9 @@ import SwiftUI
 struct DiceRollerView: View {
     @State private var numberOfDice = 1
     @State private var selectedDiceType: DiceType = .d6
-    @State private var currentRollTotal = 0
+    @State private var diceResults: [Int] = [0]  // Array to store individual die results
     @State private var isRolling = false
-    @State private var animatedRollValue = 0
+    @State private var animatedRollValues: [Int] = [0]  // Array for animation
     
     @ObservedObject var historyManager: RollHistoryManager
     
@@ -23,28 +23,32 @@ struct DiceRollerView: View {
     }
     
     var body: some View {
-        NavigationView {
-            VStack {
-                List {
-                    Section {
-                        Picker("Number of dice", selection: $numberOfDice) {
-                            ForEach(1...10, id: \.self) { number in
-                                Text("\(number)").tag(number)
-                            }
-                        }
-                        
-                        Picker("Dice type", selection: $selectedDiceType) {
-                            ForEach(diceTypes) { diceType in
-                                Text(diceType.name).tag(diceType)
-                            }
+        VStack {
+            List {
+                Section {
+                    Picker("Number of dices", selection: $numberOfDice) {
+                        ForEach(1...10, id: \.self) { number in
+                            Text("\(number)").tag(number)
                         }
                     }
+                    .onChange(of: numberOfDice) { newValue in
+                        diceResults = Array(repeating: 0, count: newValue)
+                        animatedRollValues = Array(repeating: 0, count: newValue)
+                    }
                     
-                    Section {
+                    Picker("Dice type", selection: $selectedDiceType) {
+                        ForEach(diceTypes) { diceType in
+                            Text(diceType.name).tag(diceType)
+                        }
+                    }
+                }
+                
+                Section {
+                    ForEach(0..<numberOfDice, id: \.self) { index in
                         VStack {
-                            Text("Roll result")
+                            Text("Dice \(index + 1)")
                                 .font(.headline)
-                            Text("\(isRolling ? animatedRollValue : currentRollTotal)")
+                            Text("\(isRolling ? animatedRollValues[index] : diceResults[index])")
                                 .font(.system(size: 72))
                                 .fontWeight(.bold)
                         }
@@ -52,55 +56,54 @@ struct DiceRollerView: View {
                         .listRowInsets(EdgeInsets())
                     }
                 }
-                .listStyle(InsetGroupedListStyle())
-                .navigationTitle("DiceRoller")
-                .navigationBarTitleDisplayMode(.inline)
-                
-                Button(action: rollDice) {
-                    Text("Roll dice")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .disabled(isRolling)
-                .listRowInsets(EdgeInsets())
-                .padding(.horizontal)
-                .padding(.vertical, 5)
-                
-                Divider()
             }
+            .listStyle(InsetGroupedListStyle())
+            .navigationTitle("DiceRoller")
+            .navigationBarTitleDisplayMode(.inline)
+            
+            Button(action: rollDice) {
+                Text("Roll dice")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+            .disabled(isRolling)
+            .padding(.horizontal)
+            .padding(.vertical, 5)
+            
+            Divider()
         }
     }
     
     private func rollDice() {
         isRolling = true
-        currentRollTotal = 0
-        animatedRollValue = 0
+        diceResults = Array(repeating: 0, count: numberOfDice)
+        animatedRollValues = Array(repeating: 0, count: numberOfDice)
         
-        // Create timer for roll animation
         var rollCount = 0
         let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            // Simulate roll animation
-            animatedRollValue = Int.random(in: 1...selectedDiceType.rawValue)
+            // Animate each die individually
+            for i in 0..<numberOfDice {
+                animatedRollValues[i] = Int.random(in: 1...selectedDiceType.rawValue)
+            }
             rollCount += 1
             
-            // Stop animation after 10 iterations
             if rollCount >= 10 {
                 timer.invalidate()
                 
-                // Calculate actual roll total
-                currentRollTotal = (0..<numberOfDice).map { _ in
+                // Final results for each die
+                diceResults = (0..<numberOfDice).map { _ in
                     Int.random(in: 1...selectedDiceType.rawValue)
-                }.reduce(0, +)
+                }
                 
-                // Create and save roll result
+                // Save the total to history
                 let result = RollResult(
                     diceType: selectedDiceType.rawValue,
                     numberOfDice: numberOfDice,
-                    total: currentRollTotal
+                    total: diceResults.reduce(0, +)
                 )
                 historyManager.saveRoll(result)
                 
