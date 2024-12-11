@@ -24,27 +24,38 @@ struct DiceRollerView: View {
     }
     
     var body: some View {
-        VStack {
-            List {
-                Section {
+        NavigationStack {
+            VStack(spacing: 10) {
+                HStack {
+                    Text("Number of dices")
+                    Spacer()
                     Picker("Number of dices", selection: $numberOfDice) {
                         ForEach(1...10, id: \.self) { number in
                             Text("\(number)").tag(number)
                         }
                     }
+                    .pickerStyle(MenuPickerStyle()) // Use a compact style like MenuPickerStyle
                     .onChange(of: numberOfDice) { oldValue, newValue in
                         diceResults = Array(repeating: 0, count: newValue)
                         animatedRollValues = Array(repeating: 0, count: newValue)
                     }
-                    
+                }
+
+                HStack {
+                    Text("Dice type")
+                    Spacer()
                     Picker("Dice type", selection: $selectedDiceType) {
                         ForEach(diceTypes) { diceType in
                             Text(diceType.name).tag(diceType)
                         }
                     }
+                    .pickerStyle(MenuPickerStyle()) // Compact style
                 }
             }
-            .listStyle(InsetGroupedListStyle())
+            .padding()
+            .background(.blue.opacity(0.1))
+            .cornerRadius(20)
+            .padding()
             .navigationTitle("DiceRoller")
             .navigationBarTitleDisplayMode(.inline)
             
