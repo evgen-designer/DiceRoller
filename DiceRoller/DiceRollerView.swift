@@ -56,7 +56,7 @@ struct DiceRollerView: View {
             .background(.blue.opacity(0.1))
             .cornerRadius(20)
             .padding()
-            .navigationTitle("DiceRoller")
+            .navigationTitle("Dices")
             .navigationBarTitleDisplayMode(.inline)
             
             ScrollView {
@@ -78,6 +78,8 @@ struct DiceRollerView: View {
                 .padding()
             }
             .frame(maxHeight: 400)
+            
+            Spacer()
             
             Button(action: rollDice) {
                 Text("Roll dice")

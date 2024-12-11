@@ -16,7 +16,7 @@ struct ContentView: View {
                 DiceRollerView(historyManager: historyManager)
             }
             .tabItem {
-                Label("Dice", systemImage: "dice")
+                Label("Dices", systemImage: "dice")
             }
             
             NavigationStack {
