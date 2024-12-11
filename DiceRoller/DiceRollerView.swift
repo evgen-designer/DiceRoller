@@ -117,7 +117,8 @@ struct DiceRollerView: View {
                 let result = RollResult(
                     diceType: selectedDiceType.rawValue,
                     numberOfDice: numberOfDice,
-                    total: diceResults.reduce(0, +)
+                    total: diceResults.reduce(0, +),
+                    individualResults: diceResults
                 )
                 historyManager.saveRoll(result)
                 isRolling = false

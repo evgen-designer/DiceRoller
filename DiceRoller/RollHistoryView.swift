@@ -15,7 +15,7 @@ struct RollHistoryView: View {
             ForEach(historyManager.rollHistory) { roll in
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("\(roll.numberOfDice) x d\(roll.diceType)")
+                        Text("d\(roll.diceType) x \(roll.numberOfDice)")
                             .font(.headline)
                         Text(roll.timestamp, format: .dateTime.day().month(.abbreviated).year().hour().minute())
                             .font(.subheadline)
@@ -30,7 +30,7 @@ struct RollHistoryView: View {
                 }
             }
         }
-        .navigationTitle("DiceRoller")
+        .navigationTitle("Roll history")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -45,9 +45,9 @@ struct RollHistoryView: View {
 #Preview {
     let historyManager = RollHistoryManager()
     // Add some sample data for the preview
-    historyManager.saveRoll(RollResult(diceType: 6, numberOfDice: 2, total: 7))
-    historyManager.saveRoll(RollResult(diceType: 20, numberOfDice: 1, total: 18))
-    historyManager.saveRoll(RollResult(diceType: 12, numberOfDice: 3, total: 25))
+    historyManager.saveRoll(RollResult(diceType: 6, numberOfDice: 2, total: 7, individualResults: [3, 4]))
+    historyManager.saveRoll(RollResult(diceType: 20, numberOfDice: 1, total: 18, individualResults: [18]))
+    historyManager.saveRoll(RollResult(diceType: 12, numberOfDice: 3, total: 25, individualResults: [8, 9, 8]))
     
     return NavigationView {
         RollHistoryView(historyManager: historyManager)
