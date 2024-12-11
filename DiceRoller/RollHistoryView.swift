@@ -15,9 +15,9 @@ struct RollHistoryView: View {
             ForEach(historyManager.rollHistory) { roll in
                 HStack {
                     VStack(alignment: .leading) {
-                        Text("\(roll.numberOfDice)d\(roll.diceType)")
+                        Text("\(roll.numberOfDice) x d\(roll.diceType)")
                             .font(.headline)
-                        Text(roll.timestamp, style: .date)
+                        Text(roll.timestamp, format: .dateTime.day().month(.abbreviated).year().hour().minute())
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
