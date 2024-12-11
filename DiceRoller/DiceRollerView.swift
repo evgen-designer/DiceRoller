@@ -31,9 +31,9 @@ struct DiceRollerView: View {
                             Text("\(number)").tag(number)
                         }
                     }
-                    .onChange(of: numberOfDice) { newValue in
-                        diceResults = Array(repeating: 0, count: newValue)
-                        animatedRollValues = Array(repeating: 0, count: newValue)
+                    .onChange(of: numberOfDice) {
+                        diceResults = Array(repeating: 0, count: numberOfDice)
+                        animatedRollValues = Array(repeating: 0, count: numberOfDice)
                     }
                     
                     Picker("Dice type", selection: $selectedDiceType) {
@@ -116,4 +116,4 @@ struct DiceRollerView: View {
 
 #Preview {
     DiceRollerView(historyManager: RollHistoryManager())
-} 
+}
