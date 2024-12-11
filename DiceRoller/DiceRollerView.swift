@@ -10,13 +10,14 @@ import SwiftUI
 struct DiceRollerView: View {
     @State private var numberOfDice = 1
     @State private var selectedDiceType: DiceType = .d6
-    @State private var diceResults: [Int] = [0]  // Array to store individual die results
+    @State private var diceResults: [Int] = [0]
     @State private var isRolling = false
-    @State private var animatedRollValues: [Int] = [0]  // Array for animation
+    @State private var animatedRollValues: [Int] = [0]
     
     @ObservedObject var historyManager: RollHistoryManager
     
     private var diceTypes = DiceType.allCases
+    private let columns = [GridItem(.adaptive(minimum: 80))]
     
     init(historyManager: RollHistoryManager) {
         self.historyManager = historyManager
@@ -31,7 +32,7 @@ struct DiceRollerView: View {
                             Text("\(number)").tag(number)
                         }
                     }
-                    .onChange(of: numberOfDice) {
+                    .onChange(of: numberOfDice) { _ in
                         diceResults = Array(repeating: 0, count: numberOfDice)
                         animatedRollValues = Array(repeating: 0, count: numberOfDice)
                     }
@@ -42,24 +43,30 @@ struct DiceRollerView: View {
                         }
                     }
                 }
-                
-                Section {
-                    ForEach(0..<numberOfDice, id: \.self) { index in
-                        VStack {
-                            Text("Dice \(index + 1)")
-                                .font(.headline)
-                            Text("\(isRolling ? animatedRollValues[index] : diceResults[index])")
-                                .font(.system(size: 72))
-                                .fontWeight(.bold)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 150)
-                        .listRowInsets(EdgeInsets())
-                    }
-                }
             }
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("DiceRoller")
             .navigationBarTitleDisplayMode(.inline)
+            
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 20) {
+                    ForEach(0..<diceResults.count, id: \.self) { index in
+                        VStack {
+                            Text("Dice \(index + 1)")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                            Text("\(isRolling ? animatedRollValues[safe: index] ?? 0 : diceResults[safe: index] ?? 0)")
+                                .font(.system(size: 36))
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity, minHeight: 60)
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(10)
+                        }
+                    }
+                }
+                .padding()
+            }
+            .frame(maxHeight: 400)
             
             Button(action: rollDice) {
                 Text("Roll dice")
@@ -85,7 +92,6 @@ struct DiceRollerView: View {
         
         var rollCount = 0
         let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
-            // Animate each die individually
             for i in 0..<numberOfDice {
                 animatedRollValues[i] = Int.random(in: 1...selectedDiceType.rawValue)
             }
@@ -93,20 +99,16 @@ struct DiceRollerView: View {
             
             if rollCount >= 10 {
                 timer.invalidate()
-                
-                // Final results for each die
                 diceResults = (0..<numberOfDice).map { _ in
                     Int.random(in: 1...selectedDiceType.rawValue)
                 }
                 
-                // Save the total to history
                 let result = RollResult(
                     diceType: selectedDiceType.rawValue,
                     numberOfDice: numberOfDice,
                     total: diceResults.reduce(0, +)
                 )
                 historyManager.saveRoll(result)
-                
                 isRolling = false
             }
         }
@@ -114,6 +116,13 @@ struct DiceRollerView: View {
     }
 }
 
+extension Array {
+    subscript(safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+}
+
 #Preview {
     DiceRollerView(historyManager: RollHistoryManager())
 }
+
